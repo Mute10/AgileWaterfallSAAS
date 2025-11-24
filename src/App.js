@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
+import AgilePage from "./pages/AgilePage"
+import WaterfallPage from "./pages/WaterfallPage";
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Router>
+      <nav style={{padding: "1rem", background: "#eee"}}>
+      <h3 style={{ padding: "10px", border: "solid 4px", color: "blue"}}>Click on <Link to="/agile">Agile</Link> or <Link to="/waterfall">Waterfall </Link> 
+       to see my project in action.</h3>
+      </nav>
+   
+      <div style={{padding: "1rem"}}>
+      
+        <Routes>
+         
+          <Route path="/agile" element={<AgilePage/>} />
+          <Route path="/waterfall" element={<WaterfallPage/>} />
+        </Routes>
+      </div>
+    </Router>
+    
+  )
 }
-
 export default App;
