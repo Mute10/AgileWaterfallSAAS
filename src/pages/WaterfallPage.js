@@ -7,6 +7,8 @@ function WaterfallPage() {
         const [newStart, setNewStart] = useState("")
         const [newEnd, setNewEnd] = useState("")
         const [selectedId, setSelectedId] = useState(null)
+        const [newDescription, setNewDescription] = useState("")
+
 
        useEffect(()=> {
         try {
@@ -33,7 +35,8 @@ function WaterfallPage() {
 
         
        
-
+        const PIXELS_PER_DAY = 20; 
+            
 
         const getDurationDays = (start, end) => {
                 const s = new Date(start)
@@ -50,13 +53,14 @@ function WaterfallPage() {
                 title: newTitle,
                 start: newStart,
                 end: newEnd,
-                status: "Pending"
+                status: "Pending",
+                description: newDescription
             };
             
             const updated = [...milestones, newItem]
             setMilestones(updated)
             localStorage.setItem("waterfall", JSON.stringify(updated))
-            setNewTitle(""); setNewStart(""); setNewEnd("");
+            setNewTitle(""); setNewStart(""); setNewEnd(""); setNewDescription("")
         }
         const selectMilestone = (id) => {
             setSelectedId(id)
@@ -68,7 +72,7 @@ function WaterfallPage() {
         };
 
 
-           {/* Add colors to progress bar */}
+           {/* Add colors to Gantt bar */}
             const statusColors = {
                 "Pending": "#90ee90",
                 "In Progress": "#90ee90",
@@ -76,9 +80,10 @@ function WaterfallPage() {
                 
             }
             
-
+           
 
         //COMPONENT STARTS
+
          useEffect(() => {
             const saved = localStorage.getItem("waterfall");
             if(saved) {
@@ -132,8 +137,7 @@ function WaterfallPage() {
                 const diff = d - earliestStart;
                 return Math.max(0, Math.floor(diff/(1000 * 60 * 60 *24)))
             }; 
-            const PIXELS_PER_DAY = 21; 
-
+            
 
 
 
@@ -149,8 +153,14 @@ return (
       <input type="date" value={newStart} onChange={(e) => setNewStart(e.target.value)} />
       <input type="date" value={newEnd} onChange={(e) => setNewEnd(e.target.value)} />
       <button onClick={addMilestone}>Add</button>
-      
+      <input type="text" placeholder="Milestone Description (what is the goal?)"
+      value={newDescription} onChange={(e) => setNewDescription(e.target.value)}
+      style={{display: "block", marginTop: "1 rem", width: "100%", }}/>
+    
+
     </div>
+
+
 
     {/* List milestones */}
     <div>
@@ -158,13 +168,14 @@ return (
         const duration = getDurationDays(m.start, m.end);
         const offSetDays = getDayOffset(m.start);
         const leftOffset = offSetDays * PIXELS_PER_DAY;
-        const width = duration * PIXELS_PER_DAY;
+        const width = duration * PIXELS_PER_DAY; 
 
         return (
           <div
             key={m.id}
-            style={{ padding: "0.5rem 1rem", marginBottom: "0.5rem", 
-                background: "#f3f3f3", borderRadius: "6px" }}
+            style={{ padding: "1rem 1rem", marginBottom: "1rem", background: "#f3f3f3",
+              borderRadius: "10px", position: "relative", 
+            }}
           >
             <strong>{m.title}</strong>
             <br />
@@ -175,47 +186,45 @@ return (
             <span>⏱ {duration} days</span>
             <br />
 
-            {/* Gantt bar container */}
+
+            {/* Gantt Bar */}
             <div
               id={`m-${m.id}`}
               onClick={() => selectMilestone(m.id)}
-              style={{ cursor: "pointer", border: selectedId === m.id ? "3px solid #4a90e2" : "1px solid #999", borderRadius: "4px", padding: "2px" }}
-            >
+              style={{ cursor: "pointer", 
+                border: selectedId === m.id ? "3px solid #4a90e2" : "1px solid #999", 
+                borderRadius: "4px", padding: "2px" }}
+            >Gantt Bar
               <div
                 style={{
                   position: "relative",
-                  height: "20px",
+                  height: "40px",
+                  left: `${leftOffset}px`,
+                  witdh: `${width}px`,
                   background: "#ddd",
-                  borderRadius: "4px",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 7px rgba(0,0,0,0,1)",
+                  border: selectedId === m.id ?  "2px solid #4a90e2": "1px solid #ccc",
                   marginTop: "8px",
                   overflow: "hidden",
+                  transition: "all 0.2s ease",
+                  cursor: "cell"
                 }}
+                onClick={() => selectMilestone(m.id)}
               >
                 <div
                   style={{
-                    position: "absolute",
-                    left: `${leftOffset}px`,
-                    width: `${width}px`,
+                    left: 0,
+                    width: `${getProgress(m.status)}%`,
                     height: "100%",
                     background: statusColors[m.status],
-                    borderRadius: "4px",
-                    transition: "width 0.3s",
+                    borderRadius: "12px",
+                    transition: "width 0.4s ease",
                   }}
                 />
+              
               </div>
-
-              {/* progress bar */}
-              <div style={{ height: "12px", width: "100%", background: "#eee", borderRadius: "5px", marginTop: "6px" }}>
-                <div
-                  style={{
-                    height: "100%",
-                    width: `${getProgress(m.status)}%`,
-                    background: statusColors[m.status],
-                    borderRadius: "5px",
-                    transition: "width 0.3s",
-                  }}
-                /></div>
-            </div>
+             </div>
 
             {/* status dropdown */}
             <select value={m.status} onChange={(e) => updateStatus(m.id, e.target.value)} style={{ marginTop: "6px" }}>
@@ -234,8 +243,10 @@ return (
     {/* Selected milestone info */}
     {selectedId && (() => {
       const s = milestones.find((m) => m.id === selectedId);
+      if(!s) return null;
       return (
-        <div style={{ marginTop: "10px", padding: "10px", border: "1px solid black", borderRadius: "7px", background: "#f7f7f7", width: "300px" }}>
+        <div style={{ marginTop: "10px", padding: "10px", border: "1px solid black", borderRadius: "7px", background: "#f7f7f7", 
+        width: "300px" }}>
           <h4>{s.title}</h4>
           <p>
             <b>Start: </b>
@@ -248,6 +259,7 @@ return (
           <p>
             <b>Status:</b> {s.status}
           </p>
+          <p><b>Description:</b>{s.description}</p>
         </div>
       );
     })()}
