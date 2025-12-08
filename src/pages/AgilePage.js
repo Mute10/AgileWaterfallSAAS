@@ -1,5 +1,14 @@
 import {useState, useEffect, useRef} from "react"
 
+{/* 
+Core features:
+* Controlled form inputs (useState for title + estimate)
+* Validation (ignore empty titles or invalid numbers)
+* Strict number handling with Number.parseInt()
+* Auto-reset the form after adding
+* Smooth visual refresh of the board
+*/}
+
 export default function AgilePage() {
     const [tasks, setTasks] = useState([]);
 
@@ -11,6 +20,10 @@ export default function AgilePage() {
 
 
     useEffect(() => {
+       // On first render:
+      // Simulate a short loading delay (300ms)
+     // Load tasks from localStorage
+    // Sort them before putting into state
         const loadTasks = async () => {
             await new Promise((resolve) => setTimeout(resolve, 300))
                 const storedTasks = JSON.parse(localStorage.getItem("tasks")) || []
