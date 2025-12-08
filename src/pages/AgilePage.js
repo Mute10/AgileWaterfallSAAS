@@ -115,7 +115,7 @@ useEffect(() => {
                 )
             }, [sortBy, filterBy, searchTerm])
  
-            useEffect(() => {
+            useEffect(() => {  // Auto-hide the toast after 3 seconds. 
               if (!toast) return
               const timer = setTimeout(() => setToast(""), 3000)
               return () => clearTimeout(timer)
