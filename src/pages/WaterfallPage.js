@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 
-function WaterfallPage() {
+export default function WaterfallPage() {
     const [milestones, setMilestones] = useState([]);
 
         const [newTitle, setNewTitle] = useState("");
@@ -10,7 +10,7 @@ function WaterfallPage() {
         const [newDescription, setNewDescription] = useState("")
 
 
-       useEffect(()=> {
+       useEffect(()=> {  // On first render: load previously-saved milestones from localStorage
         try {
             const saved = localStorage.getItem("waterfall_milestones");
             if (saved) {
@@ -21,14 +21,14 @@ function WaterfallPage() {
         }
        }, [])
 
-       useEffect(() => {
+       useEffect(() => {  // Persist milestones to localStorage whenever they change
         try {
             localStorage.setItem("waterfall_milestone", JSON.stringify(milestones));
         } catch (e) {
             console.error("Failed to save waterfall milestones", e);
         }
      }, [milestones])
-     useEffect(() => {
+     useEffect(() => {  // If the selected milestone no longer exists (e.g., was deleted), clear the selection.
         if (selectedId && !milestones.find((m)=> m.id === selectedId)){
             setSelectedId(null);
         }}, [milestones, selectedId])
@@ -82,7 +82,7 @@ function WaterfallPage() {
             
            
 
-        //COMPONENT STARTS
+     
 
          useEffect(() => {
             const saved = localStorage.getItem("waterfall");
@@ -141,7 +141,7 @@ function WaterfallPage() {
 
 
 
-{/* UI Design*/}
+
 return ( 
   <div style={{ padding: "1rem" }}>
     <h2>Waterfall Page</h2>
@@ -266,5 +266,3 @@ return (
   </div>
 );
 }
-
-export default WaterfallPage;
